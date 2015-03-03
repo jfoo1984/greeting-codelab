@@ -21,7 +21,7 @@ def greeting(name):
 Hi Sarah, pleased to meet you!
 ```
 
-Let's try to do the same thing but as a website using bottle.py. First, create a Cloud 9 workspace called greeting. Then in a terminal, run the following command to install bottle.py:
+Let's try to do the same thing but as a website using bottle.py. First, create a Cloud 9 workspace called `greeting`. Then in a terminal, run the following command to install bottle.py:
 
 ```bash
 sudo pip install bottle
@@ -49,7 +49,7 @@ Make sure to substitute `<username>` and `<name>` with your own values.
 
 #### What's going on?
 
- * bottle.py methods: route, run, template
+ * bottle.py methods: `route`, `run`, `template`
  * Web browser URL parsing
  * Browser, HTTP, DNS, TCP/IP, routers, web server
 
@@ -86,18 +86,18 @@ def greeting_post():
     return template('Hi {{name}}, pleased to meet you!', name=name)
 ```
 
-Perform a GET request by opening the following URL:
+Perform a GET request by loading the following URL:
 ```
 https://greeting-<username>.c9.io/greeting
 ```
 
 #### What's going on?
 
- * Seperate handlers for GET and POST requests
+ * Separate handlers for GET and POST requests
    * GET to fetch HTML page
    * POST to receive form response
  * HTML form
- * New bottle.py methods: get, post, request
+ * New bottle.py methods: `get`, `post`, `request`
 
 #### Learn more
 
@@ -108,7 +108,7 @@ https://greeting-<username>.c9.io/greeting
 
 This is all great, but I don't want to mix my python and HTML code. Mixing the two makes it hard to read, especially when there's lots of HTML.
 
-Let's seperate our Python and HTML code by moving the HTML code into a template file.  First, modify your two request handler functions so they look like this:
+Let's separate our Python and HTML code by moving the HTML code into a template file.  First, modify your two request handler functions so they look like this:
 
 ```python
 @get('/greeting')
@@ -121,7 +121,7 @@ def greeting_post():
     return template('greeting', name=name)
 ```
 
-Next, create a new folder called `views` and create a new file called ```greeting.l` inside it with the following contents:
+Next, create a new folder called `views` and create a new file called `greeting.tpl` inside it with the following contents:
 
 ```html
 <!DOCTYPE html>
@@ -151,12 +151,14 @@ Next, create a new folder called `views` and create a new file called ```greetin
 </html>
 ```
 
+Reload the page.
+
 #### What's going on?
 
- * separate HTML file
+ * Separate HTML file
  * First parameter to `template()` function is name of `.tpl` file to render
  * bottle.py templating language: `%`, `{{ }}`
- * HTML tags: head, body, div, form, input
+ * HTML tags: `head`, `body`, `div`, `form`, `input`, `a`
 
 #### Learn more
 
@@ -168,7 +170,7 @@ Next, create a new folder called `views` and create a new file called ```greetin
 
 My site looks ugly. How do I make it look prettier?
 
-CSS, or cascading style sheets, is a language used to specify the look and formatting of a document. It's used to seperate a document's content from it's presentation.
+CSS, or cascading style sheets, is a language used to specify the look and formatting of a document. It's used to separate a document's content from its presentation.
 
 Modify `greeting.tpl` so it looks like the code below.  Note the addition of the `<style>` tag within `<head>` and the addition of `id=` fields for a few of the `<div>`'s.
 
@@ -228,9 +230,9 @@ Modify `greeting.tpl` so it looks like the code below.  Note the addition of the
 
 I'd like to store the names my users submit. How can I do this?
 
-Let's use [Redis](http://redis.io/) for server-side data persistence. Redis is a very popular in-memory data structure storage server.
+A dictionary (also known as a hash table) is a type of data structure that maps keys to values and might be useful here. We can store each name in the dictionary (key) and also keep track of how many times we've seen each name (value).
 
-In particular, let's store each name in a dictionary and keep track of how many times we've seen teach name.
+Let's use [Redis](http://redis.io/) for server-side data persistence. Redis is a very popular in-memory data structure storage server that happens to support hash tables.
 
 In a terminal, run the following commands to start the Redis server and install Python bindings for Redis:
 
@@ -257,7 +259,7 @@ def greeting_post():
     return template('greeting', name=name, summary=None)
 ```
 
-Finally, modify `greeting.tpl` to match the code below.  The only addition is the `table` inside the `%else` block.
+Finally, modify `greeting.tpl` to match the code below.  The only additions are the `<table>` block inside the `%else` condition and associated CSS entries in `<style>`.
 
 ```html
 <!DOCTYPE html>
@@ -319,11 +321,14 @@ Finally, modify `greeting.tpl` to match the code below.  The only addition is th
 </html>
 ```
 
+Reload the page and try submitting a few names.
+
 #### What's going on?
 
- * Redis dictionary (hash) data structure to count instances of each name
- * Redis commands `HGETALL` and `HINCRBY`
+ * Redis hash table data structure to count instances of each name
+ * Redis commands `HGETALL` and `HINCRBY` to fetch and store data in hash table
  * Render contents of hash table in HTML on GET request
+ * On POST, increment hash table entry by one for associated name
 
 #### Learn more
 
