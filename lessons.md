@@ -2,10 +2,10 @@
 
 In this codelab you will make a greeting generator that makes use of the following technologies:
 
- * Cloud 9
- * Python-based web server (bottle.py)
+ * [Cloud 9](https://c9.io/)
+ * Python-based web server ([bottle.py](http://bottlepy.org/))
  * HTML and CSS
- * Server-side persistent storage (Redis)
+ * Server-side persistent storage ([Redis](http://redis.io/))
 
 The source code for the lessons are available [on GitHub](https://github.com/jeztek/greeting-codelab).
 
@@ -16,7 +16,7 @@ This should look familiar:
 ```python
 def greeting(name):
 	print "Hi %s, pleased to meet you!" % (name)
-   
+
 >>> greeting("Sarah")
 Hi Sarah, pleased to meet you!
 ```
@@ -34,24 +34,24 @@ from bottle import route, run, template
 @route('/greeting/<name>')
 def greeting(name):
 	return template("Hi {{name}}, pleased to meet you!", name=name)
-    
+
 run(host=os.getenv("IP"), port=os.getenv("PORT"), debug=True, reloader=True)
 ```
 
-Hit run.   You should be able to access the website here:
+Hit run. You should be able to access the website here:
 
 ```
 https://greeting-<username>.c9.io/greeting/<name>
 ```
 
-Make sure to substitute ```username``` and ```name``` with your own values.
+Make sure to substitute ```<username>``` and ```<name>``` with your own values.
 
 What's going on here?
 
  * bottle.py methods: route, run, template
  * Web browser URL parsing
  * Browser, HTTP, DNS, TCP/IP, routers, web server
- 
+
 ## Lesson 2 - HTTP Request
 
 This is great if we already know your name, but what if we want to ask you for it?
@@ -83,7 +83,11 @@ def greeting_post():
     return template('Hi {{name}}, pleased to meet you!', name=name)
 ```
 
-We now have two seperate handlers, one to return some HTML via GET, and one to accept the form response via POST.
+What's going on here?
+
+ * We now have two seperate handlers, GET and POST
+ * GET to fetch HTML page
+ * POST to receive form response
 
 ## Lesson 3 - HTML and templates
 
@@ -108,7 +112,7 @@ and create a new folder called ```views``` and create a new file called ```greet
   <head>
     <title>The Greeting Generator</title>
   </head>
-  
+
   <body>
     % if name:
     <div>
@@ -159,7 +163,7 @@ How do I make my site look prettier?  Modify ```greeting.tpl``` so it looks like
       }
     </style>
   </head>
-  
+
   <body>
     % if name:
     <div id="greeting">
@@ -244,7 +248,7 @@ and modify ```greeting.tpl``` to match the code below.  The only addition is the
       }
     </style>
   </head>
-  
+
   <body>
     % if name:
     <div id="greeting">
@@ -282,5 +286,7 @@ and modify ```greeting.tpl``` to match the code below.  The only addition is the
 What's going on here?
 
  * Redis hash data structure to count instances of each name
+ * Redis commands ```HGETALL``` and ```HINCRBY```
+ * Experiment with Redis commands using ```redis-cli```
  * Render contents of hash table in HTML on GET request
  * Data is persisted in Redis
