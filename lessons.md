@@ -1,4 +1,4 @@
-# Greetings Codelab
+# Greeting Generator Codelab
 
 In this codelab you will make a greeting generator that makes use of the following technologies:
 
@@ -21,15 +21,16 @@ def greeting(name):
 Hi Sarah, pleased to meet you!
 ```
 
-Let's try to do the same thing but as a website using bottle.py. First, create a Cloud 9 workspace called greeting.  Then in a terminal, run the following command to make sure to install  bottle.py:
+Let's try to do the same thing but as a website using bottle.py. First, create a Cloud 9 workspace called greeting. Then in a terminal, run the following command to install bottle.py:
 
 ```bash
 sudo pip install bottle
 ```
 
-Save the following code as ```website.py```:
+Save the following code as `website.py`:
 ```python
 from bottle import route, run, template
+import os
 
 @route('/greeting/<name>')
 def greeting(name):
@@ -44,26 +45,28 @@ Hit run. You should be able to access the website here:
 https://greeting-<username>.c9.io/greeting/<name>
 ```
 
-Make sure to substitute ```<username>``` and ```<name>``` with your own values.
+Make sure to substitute `<username>` and `<name>` with your own values.
 
-What's going on here?
+#### What's going on?
 
  * bottle.py methods: route, run, template
  * Web browser URL parsing
  * Browser, HTTP, DNS, TCP/IP, routers, web server
 
+#### Learn more
+ * [W3 article on "How does the Internet work?"](http://www.w3.org/wiki/How_does_the_Internet_work).
+ * [bottle.py tutorial](http://bottlepy.org/docs/dev/tutorial.html)
+
 ## Lesson 2 - HTTP Request
 
 This is great if we already know your name, but what if we want to ask you for it?
 
-Web servers respond to several types of HTTP requests:
+Web servers respond to several types of HTTP requests but the most popular are:
 
  * GET
  * POST
- * PUT
- * DELETE
 
-In lesson 1 we made a GET request to fetch data, but it's customary to send data back via POST.  In ```website.py```, update your import statements and replace your greeting function with the following two new functions:
+In lesson 1 we made a GET request to fetch data, but it's customary to send data back via POST.  In `website.py`, update your import statements and replace your greeting function with the following two new functions:
 
 ```python
 from bottle import get, post, request, run, template
@@ -83,15 +86,29 @@ def greeting_post():
     return template('Hi {{name}}, pleased to meet you!', name=name)
 ```
 
-What's going on here?
+Perform a GET request by opening the following URL:
+```
+https://greeting-<username>.c9.io/greeting
+```
 
- * We now have two seperate handlers, GET and POST
- * GET to fetch HTML page
- * POST to receive form response
+#### What's going on?
+
+ * Seperate handlers for GET and POST requests
+   * GET to fetch HTML page
+   * POST to receive form response
+ * HTML form
+ * New bottle.py methods: get, post, request
+
+#### Learn more
+
+ * [Wikipedia article on HTTP request methods](http://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol#Request_methods)
+ * [HTML form tag documentation](http://www.w3schools.com/tags/tag_form.asp)
 
 ## Lesson 3 - HTML and templates
 
-This is all great, but I don't want to mix my python and HTML code.  Let's seperate the two by moving the HTML code to a template.  Modify your two functions so they look like this:
+This is all great, but I don't want to mix my python and HTML code. Mixing the two makes it hard to read, especially when there's lots of HTML.
+
+Let's seperate our Python and HTML code by moving the HTML code into a template file.  First, modify your two request handler functions so they look like this:
 
 ```python
 @get('/greeting')
@@ -104,7 +121,7 @@ def greeting_post():
     return template('greeting', name=name)
 ```
 
-and create a new folder called ```views``` and create a new file called ```greeting.tpl``` inside with the following contents:
+Next, create a new folder called `views` and create a new file called ```greeting.l` inside it with the following contents:
 
 ```html
 <!DOCTYPE html>
@@ -134,15 +151,26 @@ and create a new folder called ```views``` and create a new file called ```greet
 </html>
 ```
 
-What's going on here?
+#### What's going on?
 
  * separate HTML file
+ * First parameter to `template()` function is name of `.tpl` file to render
+ * bottle.py templating language: `%`, `{{ }}`
  * HTML tags: head, body, div, form, input
- * bottle.py templating language
+
+#### Learn more
+
+ * [HTML tags reference](http://www.w3schools.com/tags/)
+ * [bottle.py SimpleTemplate Engine documentation](http://bottlepy.org/docs/dev/stpl.html)
+ * Try viewing the source of your favorite website
 
 ## Lesson 4 - CSS
 
-How do I make my site look prettier?  Modify ```greeting.tpl``` so it looks like the code below.  Note the addition of the ```<style>``` tag within ```<head>``` and the addition of ```id=``` fields for a few of the ```div```'s.
+My site looks ugly. How do I make it look prettier?
+
+CSS, or cascading style sheets, is a language used to specify the look and formatting of a document. It's used to seperate a document's content from it's presentation.
+
+Modify `greeting.tpl` so it looks like the code below.  Note the addition of the `<style>` tag within `<head>` and the addition of `id=` fields for a few of the `<div>`'s.
 
 ```html
 <!DOCTYPE html>
@@ -186,24 +214,32 @@ How do I make my site look prettier?  Modify ```greeting.tpl``` so it looks like
 
 ```
 
-What's going on here?
+#### What's going on?
 
- * CSS styling that references tags in HTML
- * CSS styling can be referenced via HTML element name, id, or class
- * Try inspecting elements in the browser
+ * CSS selectors reference tag properties in HTML
+ * CSS selectors refer to HTML tag name, id, or class
 
+#### Learn more
+
+ * [Wikipedia article about CSS](http://en.wikipedia.org/wiki/Cascading_Style_Sheets)
+ * Try inspecting elements in the browser and modify their CSS properties
+ 
 ## Lesson 5 - Data persistence using Redis
 
-How do I store data?  Let's use [Redis](http://redis.io/) to store some data.
+I'd like to store the names my users submit. How can I do this?
 
-In a terminal, run the following commands to start Redis and install Python bindings for Redis:
+Let's use [Redis](http://redis.io/) for server-side data persistence. Redis is a very popular in-memory data structure storage server.
+
+In particular, let's store each name in a dictionary and keep track of how many times we've seen teach name.
+
+In a terminal, run the following commands to start the Redis server and install Python bindings for Redis:
 
 ```bash
 sudo service redis-server start
 sudo pip install redis
 ```
 
-Next, modify ```website.py``` so it looks like the code below.  Note the additional Redis references:
+Next, modify `website.py` so it looks like the code below.  Note the additional Redis references, `r.hgetall()` and `r.hincrby()`, and new variable `summary` passed into `template()`:
 
 ```python
 import redis
@@ -221,7 +257,7 @@ def greeting_post():
     return template('greeting', name=name, summary=None)
 ```
 
-and modify ```greeting.tpl``` to match the code below.  The only addition is the ```table``` inside the ```%else``` block.
+Finally, modify `greeting.tpl` to match the code below.  The only addition is the `table` inside the `%else` block.
 
 ```html
 <!DOCTYPE html>
@@ -283,10 +319,13 @@ and modify ```greeting.tpl``` to match the code below.  The only addition is the
 </html>
 ```
 
-What's going on here?
+#### What's going on?
 
- * Redis hash data structure to count instances of each name
- * Redis commands ```HGETALL``` and ```HINCRBY```
- * Experiment with Redis commands using ```redis-cli```
+ * Redis dictionary (hash) data structure to count instances of each name
+ * Redis commands `HGETALL` and `HINCRBY`
  * Render contents of hash table in HTML on GET request
- * Data is persisted in Redis
+
+#### Learn more
+
+ * [Redis command reference](http://redis.io/commands)
+ * Experiment with Redis commands using `redis-cli`
